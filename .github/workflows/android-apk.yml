@@ -1,0 +1,34 @@
+name: Build Android beta (APK)
+
+# Run it from the Actions tab: "Build Android beta (APK)" -> "Run workflow".
+# When it finishes, the log ends with a link to download the APK to share with testers.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Link or create the Expo project
+        run: eas init --non-interactive --force
+
+      - name: Build APK on EAS
+        run: eas build --platform android --profile preview --non-interactive
