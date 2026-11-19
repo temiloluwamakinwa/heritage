@@ -57,7 +57,7 @@ npm run android    # needs a device or emulator
 
 1. Create a free account at expo.dev and an **access token** (Account settings > Access tokens).
 2. In this repo: Settings > Secrets and variables > Actions > New repository secret, name `EXPO_TOKEN`.
-3. In the Expo project's Environment variables, add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` for the **preview** environment.
+3. The Supabase URL and public (publishable) key are already in `eas.json`. They are designed to be public; never put the secret/service key there.
 4. Actions tab > "Build Android beta (APK)" > Run workflow. The log ends with a download link; share it with testers.
 
 The first Android build must create a signing key. If the non-interactive build stops on credentials, run `npx eas-cli build --platform android --profile preview` once from a computer and answer yes when it offers to generate a keystore. After that the workflow works on its own.
