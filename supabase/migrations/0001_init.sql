@@ -116,3 +116,9 @@ create policy "members replace recordings" on storage.objects
   for update using (
     bucket_id = 'recordings' and public.is_family_member(((storage.foldername(name))[1])::uuid)
   );
+
+-- Explicit API grants. New Supabase projects may not expose tables automatically,
+-- and row-level security above still decides who can see which rows.
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.families, public.family_members, public.stories to authenticated;
+grant execute on function public.create_family(text), public.join_family(text), public.is_family_member(uuid) to authenticated;
