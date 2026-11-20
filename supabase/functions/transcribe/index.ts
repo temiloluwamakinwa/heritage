@@ -1,5 +1,7 @@
-// Transcribes a story's recording using any OpenAI-compatible speech-to-text endpoint.
+// Transcribes a story's recording.
 //
+// TRANSCRIBE_PROVIDER=spitch  uses Spitch (https://api.spitch.app/v1/transcriptions); set SPITCH_API_KEY.
+// Otherwise any OpenAI-compatible speech-to-text endpoint is used:
 // Secrets (supabase secrets set ...):
 //   TRANSCRIBE_URL    e.g. https://<your-host>/v1/audio/transcriptions
 //   TRANSCRIBE_KEY    API key for that host
@@ -35,10 +37,15 @@ Deno.serve(async (req) => {
     if (error || !story) return json({ error: 'Story not found' }, 404);
     if (!story.audio_path) return json({ error: 'This story has no recording' }, 400);
 
-    const endpoint = Deno.env.get('TRANSCRIBE_URL');
-    const key = Deno.env.get('TRANSCRIBE_KEY');
+    const provider = (Deno.env.get('TRANSCRIBE_PROVIDER') ?? 'openai').toLowerCase();
+    const spitch = provider === 'spitch';
+    const endpoint = spitch ? 'https://api.spitch.app/v1/transcriptions' : Deno.env.get('TRANSCRIBE_URL');
+    const key = spitch ? Deno.env.get('SPITCH_API_KEY') : Deno.env.get('TRANSCRIBE_KEY');
     if (!endpoint || !key) {
-      return json({ error: 'Transcription service is not configured yet (TRANSCRIBE_URL / TRANSCRIBE_KEY).' }, 503);
+      return json(
+        { error: spitch ? 'Transcription is not configured yet (SPITCH_API_KEY).' : 'Transcription service is not configured yet (TRANSCRIBE_URL / TRANSCRIBE_KEY).' },
+        503,
+      );
     }
 
     await admin.from('stories').update({ status: 'transcribing' }).eq('id', story_id);
@@ -47,12 +54,19 @@ Deno.serve(async (req) => {
     if (dlErr || !audio) throw new Error('Could not read the recording');
 
     const ext = story.audio_path.endsWith('.webm') ? 'webm' : 'm4a';
+    const file = new File([audio], `story.${ext}`, { type: audio.type || 'audio/mp4' });
     const form = new FormData();
-    form.append('file', new File([audio], `story.${ext}`, { type: audio.type || 'audio/mp4' }));
-    form.append('model', Deno.env.get('TRANSCRIBE_MODEL') ?? 'whisper-1');
-    form.append('response_format', 'json');
-    // Nigerian Pidgin has no ISO-639-1 code in most providers: let them auto-detect.
-    if (story.language !== 'pcm') form.append('language', story.language);
+    if (spitch) {
+      // Spitch supports yo, ig, ha and en. Pidgin is not a Spitch language: English is the closest fit.
+      form.append('content', file);
+      form.append('language', story.language === 'pcm' ? 'en' : story.language);
+    } else {
+      form.append('file', file);
+      form.append('model', Deno.env.get('TRANSCRIBE_MODEL') ?? 'whisper-1');
+      form.append('response_format', 'json');
+      // Nigerian Pidgin has no ISO-639-1 code in most providers: let them auto-detect.
+      if (story.language !== 'pcm') form.append('language', story.language);
+    }
 
     const res = await fetch(endpoint, { method: 'POST', headers: { Authorization: `Bearer ${key}` }, body: form });
     if (!res.ok) throw new Error(`Transcription provider returned ${res.status}`);
