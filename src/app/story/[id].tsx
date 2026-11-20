@@ -124,6 +124,7 @@ export default function StoryScreen() {
     <ScrollView contentContainerStyle={{ padding: space.md, maxWidth: 720, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
       <Heading sub={`${story.storyteller_name} · ${lang?.label}`}>{story.title || story.prompt || 'Story'}</Heading>
 
+      {story.audio_path && (
       <Card>
         <Text style={{ fontWeight: '700', color: colors.ink, marginBottom: 8 }}>Listen</Text>
         {audioError ? (
@@ -144,6 +145,7 @@ export default function StoryScreen() {
           </View>
         )}
       </Card>
+      )}
 
       <Text style={ui.label}>Chapter</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: space.sm }}>

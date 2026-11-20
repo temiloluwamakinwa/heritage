@@ -1,13 +1,15 @@
+import * as DocumentPicker from 'expo-document-picker';
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from 'expo-audio';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Platform, ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Field, Heading } from '../../components/ui';
 import { errorMessage, notify } from '../../lib/notify';
 import { PROMPTS } from '../../lib/prompts';
 import { enqueueRecording, flushQueue } from '../../lib/queue';
 import { useApp } from '../../lib/session';
+import { supabase } from '../../lib/supabase';
 import { colors, space } from '../../lib/theme';
 import { LANGUAGES, type LanguageCode } from '../../lib/types';
 
@@ -25,6 +27,8 @@ export default function Record() {
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [pasted, setPasted] = useState('');
+  const [busy, setBusy] = useState<'upload' | 'text' | null>(null);
   const startedAt = useRef(0);
 
   useEffect(() => {
@@ -58,6 +62,83 @@ export default function Record() {
       setRecording(true);
     } catch (e) {
       notify('Could not start recording', errorMessage(e));
+    }
+  }
+
+  function ready(): boolean {
+    if (!family || !session) {
+      notify('Set up your family first', 'Open the Family tab to create or join a family circle.');
+      return false;
+    }
+    if (!teller.trim()) {
+      notify('Who is telling the story?', "Please enter the storyteller's name.");
+      return false;
+    }
+    return true;
+  }
+
+  /** For a recording that was made earlier, e.g. a voice note or a file from another app. */
+  async function uploadFile() {
+    if (!ready()) return;
+    setBusy('upload');
+    try {
+      const picked = await DocumentPicker.getDocumentAsync({ type: 'audio/*', copyToCacheDirectory: true });
+      if (picked.canceled || !picked.assets?.[0]) return;
+      const asset = picked.assets[0];
+      await enqueueRecording({
+        sourceUri: asset.uri,
+        familyId: family!.id,
+        authorId: session!.user.id,
+        language,
+        prompt: prompt.text,
+        chapter: prompt.chapter,
+        storytellerName: teller.trim(),
+        durationMs: 0,
+        mime: asset.mimeType ?? 'audio/mp4',
+      });
+      flushQueue().catch(() => undefined);
+      notify('Saved', 'Your audio file is saved. It will upload and be turned into text shortly.');
+      router.push('/(tabs)');
+    } catch (e) {
+      notify('Could not add the audio file', errorMessage(e));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  /** For a story that is already written down, or a transcript typed while listening. */
+  async function saveText() {
+    if (!ready()) return;
+    if (!pasted.trim()) {
+      notify('Nothing to save', 'Type or paste the story first.');
+      return;
+    }
+    setBusy('text');
+    try {
+      const { data, error } = await supabase
+        .from('stories')
+        .insert({
+          family_id: family!.id,
+          author_id: session!.user.id,
+          storyteller_name: teller.trim(),
+          language,
+          prompt: prompt.text,
+          chapter: prompt.chapter,
+          duration_ms: 0,
+          audio_path: null,
+          transcript_text: pasted.trim(),
+          transcript_source: 'human',
+          status: 'transcribed',
+        })
+        .select('id')
+        .single();
+      if (error) throw error;
+      setPasted('');
+      router.push({ pathname: '/story/[id]', params: { id: data.id } });
+    } catch (e) {
+      notify('Could not save the story', errorMessage(e));
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -122,6 +203,30 @@ export default function Record() {
         <Text style={{ color: colors.muted, fontSize: 12, marginTop: space.md, textAlign: 'center' }}>
           Works offline. If there is no signal, the recording waits on your phone and uploads later.
         </Text>
+      </Card>
+
+      <Card style={{ marginTop: space.md }}>
+        <Text style={{ fontWeight: '700', color: colors.ink, marginBottom: 4 }}>Already have a recording?</Text>
+        <Text style={{ color: colors.muted, marginBottom: space.sm }}>
+          Add a voice note or audio file from your phone or computer. It is turned into text the same way.
+        </Text>
+        <Button title="Choose an audio file" variant="secondary" onPress={uploadFile} loading={busy === 'upload'} />
+      </Card>
+
+      <Card style={{ marginTop: space.md }}>
+        <Text style={{ fontWeight: '700', color: colors.ink, marginBottom: 4 }}>Type or paste the story</Text>
+        <Text style={{ color: colors.muted, marginBottom: space.sm }}>
+          Write as they speak, or paste a story you already have. Use the same language and storyteller above.
+        </Text>
+        <TextInput
+          multiline
+          value={pasted}
+          onChangeText={setPasted}
+          placeholder="Type or paste the story text here."
+          placeholderTextColor={colors.muted}
+          style={{ minHeight: 140, borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 12, fontSize: 16, color: colors.ink, textAlignVertical: 'top', marginBottom: space.sm, backgroundColor: colors.card }}
+        />
+        <Button title="Save this story" variant="secondary" onPress={saveText} loading={busy === 'text'} />
       </Card>
     </ScrollView>
   );

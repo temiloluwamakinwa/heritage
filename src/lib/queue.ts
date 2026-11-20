@@ -7,6 +7,18 @@ import type { PendingRecording } from './types';
 
 const KEY = 'heritage.pendingRecordings.v1';
 
+/** File extension for an audio mime type. Unknown types fall back to m4a. */
+export function extFor(mime: string): string {
+  const m = mime.toLowerCase();
+  if (m.includes('webm')) return 'webm';
+  if (m.includes('mpeg') || m.includes('mp3')) return 'mp3';
+  if (m.includes('wav')) return 'wav';
+  if (m.includes('ogg') || m.includes('opus')) return 'ogg';
+  if (m.includes('flac')) return 'flac';
+  if (m.includes('aac')) return 'aac';
+  return 'm4a';
+}
+
 export function newLocalId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
@@ -27,7 +39,7 @@ export async function enqueueRecording(
   const localId = newLocalId();
   let localUri = item.sourceUri;
   if (Platform.OS !== 'web') {
-    const ext = item.mime === 'audio/webm' ? 'webm' : 'm4a';
+    const ext = extFor(item.mime);
     const dest = new File(Paths.document, `recording-${localId}.${ext}`);
     new File(item.sourceUri).copy(dest);
     localUri = dest.uri;
@@ -49,7 +61,7 @@ async function readBytes(item: PendingRecording): Promise<ArrayBuffer | Blob> {
 
 /** Upload one queued recording: story row, audio file, then machine transcription. */
 async function uploadOne(item: PendingRecording): Promise<void> {
-  const ext = item.mime === 'audio/webm' ? 'webm' : 'm4a';
+  const ext = extFor(item.mime);
   const path = `${item.familyId}/${item.localId}.${ext}`;
 
   const body = await readBytes(item);

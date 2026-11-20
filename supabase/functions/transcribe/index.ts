@@ -58,7 +58,11 @@ Deno.serve(async (req) => {
     const { data: audio, error: dlErr } = await admin.storage.from('recordings').download(story.audio_path);
     if (dlErr || !audio) throw new Error('Could not read the recording');
 
-    const ext = story.audio_path.endsWith('.webm') ? 'webm' : 'm4a';
+    const ext = (story.audio_path.split('.').pop() ?? 'm4a').toLowerCase();
+    const mimeByExt: Record<string, string> = {
+      webm: 'audio/webm', m4a: 'audio/mp4', mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac', aac: 'audio/aac',
+    };
+    const mime = mimeByExt[ext] ?? 'audio/mp4';
 
     if (gemini) {
       // Gemini takes audio inline (under ~20 MB per request) and follows a transcription prompt.
@@ -73,7 +77,7 @@ Deno.serve(async (req) => {
         headers: { 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')!, 'content-type': 'application/json' },
         body: JSON.stringify({
           contents: [
-            { role: 'user', parts: [{ text: prompt }, { inline_data: { mime_type: ext === 'webm' ? 'audio/webm' : 'audio/mp4', data: btoa(bin) } }] },
+            { role: 'user', parts: [{ text: prompt }, { inline_data: { mime_type: mime, data: btoa(bin) } }] },
           ],
         }),
       });
@@ -88,7 +92,7 @@ Deno.serve(async (req) => {
       return json({ ok: true, provider, characters: gtext.length });
     }
 
-    const file = new File([audio], `story.${ext}`, { type: audio.type || 'audio/mp4' });
+    const file = new File([audio], `story.${ext}`, { type: mime });
     const form = new FormData();
     if (spitch) {
       // Spitch supports yo, ig, ha and en. Pidgin is not a Spitch language: English is the closest fit.
