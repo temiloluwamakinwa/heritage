@@ -34,5 +34,10 @@ jobs:
       - name: Export web build
         run: npx expo export --platform web
 
+      - name: Add the landing page at /landing
+        run: |
+          mkdir -p dist/landing
+          cp landing/index.html dist/landing/index.html
+
       - name: Deploy to EAS Hosting
         run: eas deploy --prod --non-interactive
