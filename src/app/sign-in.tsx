@@ -45,7 +45,7 @@ export default function SignIn() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: 80, maxWidth: 480, width: '100%', alignSelf: 'center' }}>
-        <Text style={{ fontSize: 40, fontWeight: '900', color: colors.primary }}>Heritage</Text>
+        <Text style={{ fontSize: 40, fontWeight: '900', color: colors.primary }}>MyRoots</Text>
         <Text style={{ fontSize: 18, color: colors.ink, marginTop: 8, marginBottom: space.xl, lineHeight: 26 }}>
           Record the stories, names and proverbs of the people you love, in their own language, and turn them into a family book.
         </Text>

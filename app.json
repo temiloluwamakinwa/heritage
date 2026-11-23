@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Heritage",
+    "name": "MyRoots",
     "slug": "heritage",
     "scheme": "heritage",
     "version": "0.1.0",
@@ -12,7 +12,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.heritage.storybook",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Heritage records family stories in your voice so they can be turned into text and kept safe."
+        "NSMicrophoneUsageDescription": "MyRoots records family stories in your voice so they can be turned into text and kept safe."
       }
     },
     "android": {
@@ -38,7 +38,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Heritage records family stories in your voice so they can be turned into text and kept safe."
+          "microphonePermission": "MyRoots records family stories in your voice so they can be turned into text and kept safe."
         }
       ],
       "expo-sharing"

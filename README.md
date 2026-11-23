@@ -1,4 +1,4 @@
-# Heritage
+# MyRoots
 
 Record the stories, names and proverbs of the people you love, in their own language, and turn them into a family storybook. Built for Yoruba, Igbo, Hausa and Nigerian Pidgin first.
 

@@ -60,7 +60,7 @@ export default function FamilyScreen() {
             <Button
               title="Share invite"
               onPress={() =>
-                Share.share({ message: `Join our family stories on Heritage. Invite code: ${family.invite_code}` }).catch(() => undefined)
+                Share.share({ message: `Join our family stories on MyRoots. Invite code: ${family.invite_code}` }).catch(() => undefined)
               }
             />
           </Card>

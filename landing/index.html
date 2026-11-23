@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyRoots Family Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: indigo adire-cloth hero band, then warm paper sections; marigold used only for the actions. */
+:root{
+  --paper:#fbf5ea;
+  --paper-2:#f3e9d6;
+  --ink:#1d2147;
+  --indigo:#232a63;
+  --marigold:#e8a21b;
+  --leaf:#2f6b4f;
+  --muted:#5b5f7f;
+  --on-indigo:#fbf5ea;
+  --card:#fffaf0;
+  --line:#e2d4b8;
+  --display:"Young Serif",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#15172f;--paper-2:#1b1e3b;--ink:#f6ecd8;--indigo:#101230;--marigold:#f0b13a;--leaf:#6fc29b;
+    --muted:#aeb1d0;--on-indigo:#fbf5ea;--card:#1f2345;--line:#343964;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15172f;--paper-2:#1b1e3b;--ink:#f6ecd8;--indigo:#101230;--marigold:#f0b13a;--leaf:#6fc29b;
+  --muted:#aeb1d0;--on-indigo:#fbf5ea;--card:#1f2345;--line:#343964;color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--marigold);outline-offset:3px}
+.wrap{width:min(1080px,100% - 32px);margin-inline:auto}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;text-wrap:balance;margin:0}
+
+/* hero */
+.hero{
+  background-color:var(--indigo);color:var(--on-indigo);
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 0 9px, rgba(251,245,234,.09) 10px 11px, transparent 12px 19px, rgba(251,245,234,.09) 20px 21px, transparent 22px),
+    radial-gradient(circle at 0 0, rgba(232,162,27,.18) 0 3px, transparent 4px);
+  background-size:56px 56px,56px 56px;
+  padding:28px 0 72px;
+}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:64px}
+.brand{font-family:var(--display);font-size:1.45rem;text-decoration:none}
+.brand b{color:var(--marigold);font-weight:400}
+.nav a.small{font-size:.95rem;font-weight:600;text-decoration:none;border-bottom:2px solid var(--marigold);padding-bottom:2px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.3rem,5.4vw,4rem);margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--marigold)}
+.lede{font-size:1.2rem;max-width:34em;opacity:.92;margin:0 0 30px}
+.cta{display:flex;flex-wrap:wrap;gap:14px}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:999px;border:2px solid var(--marigold)}
+.btn.primary{background:var(--marigold);color:#241a00}
+.btn.ghost{color:var(--on-indigo)}
+.btn:hover{transform:translateY(-1px)}
+.note{font-size:.9rem;opacity:.75;margin-top:14px}
+
+.welcome{display:grid;gap:10px}
+.welcome div{background:rgba(251,245,234,.08);border:1px solid rgba(251,245,234,.2);border-radius:16px;padding:12px 18px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.welcome strong{font-family:var(--display);font-weight:400;font-size:1.35rem}
+.welcome span{font-size:.85rem;opacity:.75;white-space:nowrap}
+
+/* sections */
+section{padding:72px 0}
+.kicker{font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--leaf);margin-bottom:12px}
+h2{font-size:clamp(1.8rem,3.6vw,2.6rem);margin-bottom:16px}
+.intro{max-width:38em;color:var(--muted);margin:0 0 40px}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:2rem;color:var(--marigold);display:block;line-height:1;margin-bottom:10px}
+.steps h3{font-size:1.2rem;margin-bottom:8px}
+.steps p{margin:0;font-size:.98rem;color:var(--muted)}
+
+.band{background:var(--paper-2)}
+.demo{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px}
+.panel .tag{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.panel p{margin:0;font-family:var(--display);font-size:1.35rem;line-height:1.4}
+.panel.en p{color:var(--leaf)}
+.panel small{display:block;margin-top:12px;color:var(--muted);font-size:.9rem}
+
+.langs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.lang{border-top:4px solid var(--marigold);background:var(--card);padding:18px 18px 20px;border-radius:0 0 16px 16px}
+.lang h3{font-size:1.4rem;margin-bottom:6px}
+.lang p{margin:0;color:var(--muted);font-size:.95rem}
+
+.honest{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.honest ul{margin:0;padding-left:1.1em;color:var(--muted)}
+.honest li{margin-bottom:10px}
+
+.final{background:var(--indigo);color:var(--on-indigo);text-align:left}
+.final h2{max-width:16em}
+footer{padding:28px 0;font-size:.9rem;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero-grid,.demo,.honest{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .langs{grid-template-columns:1fr 1fr}
+  .nav{margin-bottom:40px}
+}
+@media (max-width:480px){
+  body{font-size:17px}
+  .steps,.langs{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){
+  .btn{transition:transform .15s ease}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav" aria-label="Main">
+      <a class="brand" href="#top">My<b>Roots</b></a>
+      <a class="small" href="#get-it">Try the beta</a>
+    </nav>
+    <div class="hero-grid" id="top">
+      <div>
+        <h1>Let your elders tell it in <em>their own language.</em></h1>
+        <p class="lede">Press record while Mama or Baba tells the story. MyRoots writes it down in Yoruba, Igbo, Hausa or Pidgin, translates it into English, and turns it into a family storybook you can print and keep.</p>
+        <div class="cta">
+          <a class="btn primary" href="https://heritage.expo.app">Open the web app</a>
+          <a class="btn ghost" href="https://expo.dev/artifacts/eas/6Ea6YWN2wEef6tzDsdYKfrb4hv2GkBGyAyS-EOABA-4.apk">Download for Android</a>
+        </div>
+        <p class="note">Free beta. On iPhone, use the web app.</p>
+      </div>
+      <div class="welcome" aria-label="Welcome in four languages">
+        <div><strong>Ẹ káàbọ̀</strong><span>Yoruba</span></div>
+        <div><strong>Nnọọ</strong><span>Igbo</span></div>
+        <div><strong>Barka da zuwa</strong><span>Hausa</span></div>
+        <div><strong>Welcome, abeg sit down</strong><span>Pidgin</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>From a phone call to a book on the shelf</h2>
+    <p class="intro">Built for sons and daughters abroad who want their parents' and grandparents' stories before they are lost.</p>
+    <ol class="steps">
+      <li><h3>Record or upload</h3><p>Record in the app, or upload a voice note or call recording you already have. You can also type or paste a story.</p></li>
+      <li><h3>Get the transcript</h3><p>The story is written out in the language it was told, with tone marks. You can correct any word.</p></li>
+      <li><h3>Read it in English</h3><p>An English translation sits beside the original, so cousins who don't speak the language can follow along.</p></li>
+      <li><h3>Make the storybook</h3><p>Collect the stories into a PDF family storybook to share, print and pass down.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="kicker">An example</div>
+    <h2>The proverb stays. The meaning travels.</h2>
+    <p class="intro">A line from a Yoruba interview, as it appears in the app.</p>
+    <div class="demo">
+      <div class="panel" lang="yo"><div class="tag">Yoruba, as spoken</div><p>Ọmọ tí a kò kọ́ ni yóò gbé ilé tí a kọ́ tà.</p></div>
+      <div class="panel en"><div class="tag">English</div><p>The child who is not taught will sell the house that was built.</p><small>Translations are a first draft. Check them with someone who speaks the language.</small></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Languages</div>
+    <h2>Four languages, to start</h2>
+    <p class="intro">We are testing with families now. Accuracy differs by language, and your feedback decides what we improve first.</p>
+    <div class="langs">
+      <div class="lang"><h3>Yoruba</h3><p>Tone marks kept where the speech is clear.</p></div>
+      <div class="lang"><h3>Igbo</h3><p>Early support, being tested.</p></div>
+      <div class="lang"><h3>Hausa</h3><p>Early support, being tested.</p></div>
+      <div class="lang"><h3>Nigerian Pidgin</h3><p>Early support, being tested.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap honest">
+    <div>
+      <div class="kicker">Honest about the beta</div>
+      <h2>This is an early version</h2>
+    </div>
+    <ul>
+      <li>Machine transcripts can miss words. You can edit every transcript before it goes in the book.</li>
+      <li>Recordings stay private to your family group.</li>
+      <li>Please tell us what breaks. Your first recording is the most useful test we have.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="final" id="get-it">
+  <div class="wrap">
+    <h2>Record one story this week.</h2>
+    <p class="lede">Start with a single question: "Tell me about the house you grew up in."</p>
+    <div class="cta">
+      <a class="btn primary" href="https://heritage.expo.app">Open the web app</a>
+      <a class="btn ghost" href="https://expo.dev/artifacts/eas/6Ea6YWN2wEef6tzDsdYKfrb4hv2GkBGyAyS-EOABA-4.apk">Download for Android</a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">MyRoots family stories. Beta.</div></footer>
+</body>
+</html>
